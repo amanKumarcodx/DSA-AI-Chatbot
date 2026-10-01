@@ -1,0 +1,33 @@
+{
+  "scripts": {
+    "server": "node server/index.cjs",
+    "start": "node server/index.cjs",
+    "build": "parcel build src/index.html"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "parcel": "^2.16.4"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "firebase": "^12.19.0",
+    "firebase-admin": "^14.5.0",
+    "katex": "^0.18.9",
+    "lucide-react": "^1.48.0",
+    "mongoose": "^9.10.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-markdown": "^10.1.0",
+    "redis": "^6.2.1",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
+  }
+}
