@@ -9,8 +9,9 @@ const { GoogleGenAI } = require("@google/genai");
 const DSA_SYSTEM_INSTRUCTION = require("./dsaSystemInstruction.cjs");
 const Chat = require("./models/Chat.cjs");
 const { redis } = require("./redis.cjs");
+const MAX_RESPONSE_WORDS = 30;
 const GEMINI_GENERATION_CONFIG = {
-  max_output_tokens: 2000,
+  max_output_tokens: 100,
   thinking_level: "low",
 };
 
@@ -31,13 +32,17 @@ const configuredOrigins = (process.env.CLIENT_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowedOrigins = new Set([
+  "https://dsa-ai-chatbot.netlify.app",
+  ...configuredOrigins,
+]);
 
 app.use(
   cors({
     origin(origin, callback) {
       const isLocalDevelopment =
         origin && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
-      callback(null, !origin || configuredOrigins.includes(origin) || isLocalDevelopment);
+      callback(null, !origin || allowedOrigins.has(origin) || isLocalDevelopment);
     },
   })
 );
@@ -99,7 +104,10 @@ function watchClientDisconnect(request, response) {
 
 async function streamGeminiText(response, stream, signal) {
   let answer = "";
+  let currentWord = "";
+  let wordCount = 0;
   let completed = false;
+  let reachedWordLimit = false;
   for await (const event of stream) {
     if (signal.aborted || response.destroyed) return null;
     if (event.event_type === "interaction.completed") {
@@ -110,10 +118,37 @@ async function streamGeminiText(response, stream, signal) {
       continue;
     }
     if (event.event_type !== "step.delta" || event.delta?.type !== "text") continue;
-    answer += event.delta.text;
-    writeStreamEvent(response, { text: event.delta.text });
+    let visibleText = "";
+    for (const character of event.delta.text) {
+      if (/\s/.test(character)) {
+        if (currentWord) {
+          answer += currentWord + character;
+          visibleText += currentWord + character;
+          currentWord = "";
+          wordCount += 1;
+          if (wordCount === MAX_RESPONSE_WORDS) {
+            reachedWordLimit = true;
+            break;
+          }
+        } else if (wordCount < MAX_RESPONSE_WORDS) {
+          answer += character;
+          visibleText += character;
+        }
+      } else if (wordCount < MAX_RESPONSE_WORDS) {
+        currentWord += character;
+      } else {
+        reachedWordLimit = true;
+        break;
+      }
+    }
+    if (visibleText) writeStreamEvent(response, { text: visibleText });
+    if (reachedWordLimit) break;
   }
-  if (!signal.aborted && !response.destroyed && !completed) {
+  if (!signal.aborted && !response.destroyed && currentWord && wordCount < MAX_RESPONSE_WORDS) {
+    answer += currentWord;
+    writeStreamEvent(response, { text: currentWord });
+  }
+  if (!signal.aborted && !response.destroyed && !completed && !reachedWordLimit) {
     throw new Error("Gemini's response stream ended unexpectedly.");
   }
   return answer.trim();

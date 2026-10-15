@@ -249,7 +249,9 @@ export default function ChatInterface({ user, isGuest = false, onSignOut, onSign
         ...currentChats.filter((existingChat) => existingChat._id !== chat._id),
       ]);
     } catch (error) {
-      setStatus(`${isGuest ? "Could not finish your answer" : "Could not save your message"}: ${error.message}`);
+      setStatus(controller.signal.aborted
+        ? "Response stopped. The partial answer was not saved."
+        : `${isGuest ? "Could not finish your answer" : "Could not save your message"}: ${error.message}`);
       setStreamingMessageId(null);
       setMessages((currentMessages) => currentMessages.flatMap((message) => {
         if (message._id !== assistantMessageId) return [message];
@@ -437,13 +439,24 @@ export default function ChatInterface({ user, isGuest = false, onSignOut, onSign
               placeholder="Ask a DSA question..."
               value={prompt}
             />
-            <button
-              className="rounded-md bg-[#29463a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d382d] disabled:cursor-not-allowed disabled:opacity-40"
-              disabled={!prompt.trim() || isSending}
-              type="submit"
-            >
-              {isSending ? "Writing..." : "Start"}
-            </button>
+            {isSending ? (
+              <button
+                aria-label="Stop response generation"
+                className="rounded-md border border-[#b86b58] px-4 py-2 text-sm font-semibold text-[#91432f] hover:bg-[#fff5f1]"
+                onClick={() => streamAbortRef.current?.abort()}
+                type="button"
+              >
+                Stop
+              </button>
+            ) : (
+              <button
+                className="rounded-md bg-[#29463a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d382d] disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={!prompt.trim()}
+                type="submit"
+              >
+                Start
+              </button>
+            )}
           </div>
           <p className="mt-2 text-center text-xs text-[#77847b]">{isGuest ? "Temporary chat only. Refreshing this page clears it." : "DSA-focused answers are saved with your chat."}</p>
           <p className="mt-2 text-center text-sm text-[#9a442e]" role="status" aria-live="polite">{status}</p>
