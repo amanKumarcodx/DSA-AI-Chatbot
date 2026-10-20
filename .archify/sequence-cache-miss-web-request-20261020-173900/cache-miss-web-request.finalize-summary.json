@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "sequence",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\candidate.json",
+    "sha256": "ad5858ad3970640338031aa9a595f39fdcf97ed9a68621388c7f5d612ea3505b",
+    "bytes": 3165
+  },
+  "artifact": {
+    "path": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\cache-miss-web-request.html",
+    "sha256": "c16dd1370db0a04ea1b2e38024cc39fa6859ee6d693391c836590c0ff402f464",
+    "bytes": 813095
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\cache-miss-web-request.finalize.json",
+    "summaryReceipt": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\cache-miss-web-request.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\cache-miss-web-request.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-20T12:10:06.418Z",
+    "source": "network",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 7566,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}
