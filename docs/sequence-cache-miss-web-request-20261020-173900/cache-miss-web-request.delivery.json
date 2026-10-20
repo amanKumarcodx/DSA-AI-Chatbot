@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "9180a989-9daa-4081-b6ee-f3f5aca635f1",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\candidate.json",
+  "output": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\sequence-cache-miss-web-request-20261020-173900\\cache-miss-web-request.html",
+  "specification": {
+    "sha256": "ad5858ad3970640338031aa9a595f39fdcf97ed9a68621388c7f5d612ea3505b",
+    "bytes": 3165
+  },
+  "artifact": {
+    "sha256": "c16dd1370db0a04ea1b2e38024cc39fa6859ee6d693391c836590c0ff402f464",
+    "bytes": 813095
+  }
+}

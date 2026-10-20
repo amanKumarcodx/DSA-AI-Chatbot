@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Cache-miss web request",
+    "locale": "en",
+    "output": ".archify/sequence-cache-miss-web-request-20261020-173900/cache-miss-web-request.html",
+    "quality_profile": "showcase"
+  },
+  "participants": [
+    { "id": "browser", "type": "frontend", "label": "Browser", "sublabel": "client" },
+    { "id": "api", "type": "backend", "label": "API", "sublabel": "HTTP handler" },
+    { "id": "redis", "type": "database", "label": "Redis", "sublabel": "cache" },
+    { "id": "postgres", "type": "database", "label": "PostgreSQL", "sublabel": "source of truth" }
+  ],
+  "segments": [
+    { "from": 150, "to": 230, "label": "Request" },
+    { "from": 240, "to": 310, "label": "Cache miss" },
+    { "from": 315, "to": 380, "label": "Fill and reply" }
+  ],
+  "messages": [
+    {
+      "id": "http-request",
+      "from": "browser",
+      "to": "api",
+      "y": 160,
+      "label": "GET /resource",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cache-get",
+      "from": "api",
+      "to": "redis",
+      "y": 188,
+      "label": "GET key",
+      "variant": "default"
+    },
+    {
+      "id": "cache-miss",
+      "from": "redis",
+      "to": "api",
+      "y": 216,
+      "label": "miss",
+      "variant": "return",
+      "note": "No cached payload; API queries PostgreSQL"
+    },
+    {
+      "id": "db-query",
+      "from": "api",
+      "to": "postgres",
+      "y": 268,
+      "label": "SELECT resource",
+      "variant": "emphasis"
+    },
+    {
+      "id": "db-rows",
+      "from": "postgres",
+      "to": "api",
+      "y": 296,
+      "label": "rows",
+      "variant": "return"
+    },
+    {
+      "id": "cache-set",
+      "from": "api",
+      "to": "redis",
+      "y": 324,
+      "label": "SET key",
+      "variant": "dashed",
+      "note": "Fill cache for later hits"
+    },
+    {
+      "id": "http-response",
+      "from": "api",
+      "to": "browser",
+      "y": 376,
+      "label": "200 JSON",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    { "participant": "browser", "from": 155, "to": 382, "type": "frontend" },
+    { "participant": "api", "from": 160, "to": 382, "type": "backend" },
+    { "participant": "redis", "from": 183, "to": 222, "type": "database" },
+    { "participant": "postgres", "from": 263, "to": 302, "type": "database" },
+    { "participant": "redis", "from": 319, "to": 330, "type": "database" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Lookup first",
+      "items": [
+        "The browser calls the API once",
+        "The API checks Redis before touching PostgreSQL"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "On a miss",
+      "items": [
+        "PostgreSQL is queried only after Redis returns a miss",
+        "The API writes the result back into Redis"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Reply",
+      "items": [
+        "The client receives JSON after the cache is filled",
+        "Later requests for the same key can be served from Redis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "3f948ab2-dbf6-4cb2-839a-60ddb1fa2607",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\architecture-dsa-chatbot-runtime-20261020-175044\\candidate.json",
+  "output": "C:\\Users\\av649\\OneDrive\\Desktop\\ProjectX\\project\\.archify\\architecture-dsa-chatbot-runtime-20261020-175044\\dsa-chatbot-runtime.html",
+  "specification": {
+    "sha256": "6121aae47fd0b11e7615a343ee217147b4f1165529717bb7305f51a3c77faf58",
+    "bytes": 6383
+  },
+  "artifact": {
+    "sha256": "306b7f3c6689dfd87276cc646eae036ff5283acace969236576d0d5ad0a5f172",
+    "bytes": 828751
+  }
+}
