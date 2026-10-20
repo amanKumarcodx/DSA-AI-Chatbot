@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "DSA AI Chatbot runtime",
+    "locale": "en",
+    "output": ".archify/architecture-dsa-chatbot-runtime-20261020-175044/dsa-chatbot-runtime.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/amanKumarcodx/DSA-AI-Chatbot.git",
+      "provider": "github",
+      "revision": "ed7a503e3c819044f9eb0169ef5c223deb5a7498"
+    }
+  },
+  "components": [
+    {
+      "id": "learner",
+      "type": "external",
+      "label": "Learner",
+      "sublabel": "Browser user",
+      "pos": [40, 220],
+      "size": [120, 64],
+      "sources": [
+        { "path": "app.js", "line": 45, "end_line": 68, "label": "signed-in chat route" }
+      ]
+    },
+    {
+      "id": "netlify",
+      "type": "cloud",
+      "label": "Netlify",
+      "sublabel": "SPA origin",
+      "pos": [40, 40],
+      "size": [120, 64],
+      "sources": [
+        { "path": "netlify.toml", "line": 1, "end_line": 3, "label": "SPA fallback" },
+        { "path": "src/index.html", "line": 1, "end_line": 12, "label": "Parcel entry" }
+      ]
+    },
+    {
+      "id": "firebase-auth",
+      "type": "security",
+      "label": "Firebase Auth",
+      "sublabel": "ID tokens",
+      "pos": [260, 40],
+      "size": [136, 64],
+      "sources": [
+        { "path": "components/firebase.js", "line": 10, "end_line": 23, "label": "client Auth init" },
+        { "path": "components/GoogleButton.js", "line": 6, "end_line": 8, "label": "Google popup" },
+        { "path": "app.js", "line": 15, "end_line": 20, "label": "onAuthStateChanged" }
+      ]
+    },
+    {
+      "id": "chat-spa",
+      "type": "frontend",
+      "label": "Chat SPA",
+      "sublabel": "React client",
+      "pos": [260, 220],
+      "size": [136, 64],
+      "sources": [
+        { "path": "app.js", "line": 8, "end_line": 68, "label": "auth gate" },
+        { "path": "components/ChatInterface.js", "line": 8, "end_line": 37, "label": "Bearer fetch" },
+        { "path": "components/ChatInterface.js", "line": 224, "end_line": 243, "label": "stream messages" }
+      ]
+    },
+    {
+      "id": "chat-api",
+      "type": "backend",
+      "label": "Chat API",
+      "sublabel": "Express :3003",
+      "pos": [510, 220],
+      "size": [140, 64],
+      "sources": [
+        { "path": "server/index.cjs", "line": 7, "end_line": 19, "label": "listen after Mongo" },
+        { "path": "server/app.cjs", "line": 40, "end_line": 48, "label": "CORS and JSON" },
+        { "path": "server/app.cjs", "line": 164, "end_line": 178, "label": "verifyIdToken" }
+      ]
+    },
+    {
+      "id": "gemini",
+      "type": "cloud",
+      "label": "Gemini",
+      "sublabel": "interactions API",
+      "pos": [800, 220],
+      "size": [140, 64],
+      "sources": [
+        { "path": "server/app.cjs", "line": 387, "end_line": 396, "label": "signed-in stream" },
+        { "path": "server/dsaSystemInstruction.cjs", "line": 1, "end_line": 35, "label": "DSA policy" }
+      ]
+    },
+    {
+      "id": "redis",
+      "type": "database",
+      "label": "Redis",
+      "sublabel": "optional cache",
+      "pos": [440, 420],
+      "size": [130, 60],
+      "sources": [
+        { "path": "server/redis.cjs", "line": 5, "end_line": 29, "label": "REDIS_URL client" },
+        { "path": "server/index.cjs", "line": 8, "end_line": 14, "label": "cache optional" },
+        { "path": "server/app.cjs", "line": 271, "end_line": 289, "label": "chat cache" }
+      ]
+    },
+    {
+      "id": "mongodb",
+      "type": "database",
+      "label": "MongoDB",
+      "sublabel": "Chat documents",
+      "pos": [590, 420],
+      "size": [130, 60],
+      "sources": [
+        { "path": "server/db.cjs", "line": 3, "end_line": 11, "label": "required connect" },
+        { "path": "server/models/Chat.cjs", "line": 19, "end_line": 41, "label": "Chat schema" },
+        { "path": "server/app.cjs", "line": 415, "end_line": 420, "label": "save messages" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Untrusted browser origin",
+      "wraps": ["chat-spa"]
+    },
+    {
+      "kind": "security-group",
+      "label": "CORS + Bearer API",
+      "wraps": ["chat-api"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "learner-load",
+      "from": "learner",
+      "to": "netlify",
+      "label": "load SPA",
+      "variant": "dashed"
+    },
+    {
+      "id": "learner-chat",
+      "from": "learner",
+      "to": "chat-spa",
+      "label": "use chat UI",
+      "variant": "emphasis"
+    },
+    {
+      "id": "spa-auth",
+      "from": "chat-spa",
+      "to": "firebase-auth",
+      "label": "Auth SDK",
+      "variant": "security"
+    },
+    {
+      "id": "spa-api",
+      "from": "chat-spa",
+      "to": "chat-api",
+      "label": "Bearer SSE",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-verify",
+      "from": "chat-api",
+      "to": "firebase-auth",
+      "label": "verifyIdToken",
+      "variant": "security"
+    },
+    {
+      "id": "api-gemini",
+      "from": "chat-api",
+      "to": "gemini",
+      "label": "stream generate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-redis",
+      "from": "chat-api",
+      "to": "redis",
+      "label": "optional cache",
+      "variant": "dashed"
+    },
+    {
+      "id": "api-mongo",
+      "from": "chat-api",
+      "to": "mongodb",
+      "label": "save Chat"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Primary path",
+      "items": [
+        "Signed-in POST /api/chats/:chatId/messages streams SSE, then persists both turns in MongoDB",
+        "Gemini receives DSA system_instruction and a 30-word cap from the API"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Trust",
+      "items": [
+        "Browser origin is untrusted; Express CORS allowlists Netlify and localhost",
+        "Chat history routes require Firebase ID tokens; GEMINI_API_KEY stays on the server"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Not on this path",
+      "items": [
+        "Guests POST /api/guest/message (20 / 15 min) with no MongoDB history",
+        "Redis chat and answer caches are skipped when REDIS_URL is down"
+      ]
+    }
+  ]
+}
