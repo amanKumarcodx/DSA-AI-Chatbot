@@ -10,6 +10,8 @@ const DSA_SYSTEM_INSTRUCTION = require("./dsaSystemInstruction.cjs");
 const Chat = require("./models/Chat.cjs");
 const { redis } = require("./redis.cjs");
 const MAX_RESPONSE_WORDS = 30;
+const MAX_CONTEXT_MESSAGES = 8;
+const MAX_CONTEXT_MESSAGE_LENGTH = 3000;
 const GEMINI_GENERATION_CONFIG = {
   max_output_tokens: 100,
   thinking_level: "low",
@@ -345,8 +347,8 @@ app.post(
       if (!chat) return response.status(404).json({ error: "Chat not found." });
 
       const priorContext = chat.messages
-        .slice(-16)
-        .map((message) => `${message.role === "assistant" ? "Instructor" : "Student"}: ${message.content.slice(0, 6000)}`)
+        .slice(-MAX_CONTEXT_MESSAGES)
+        .map((message) => `${message.role === "assistant" ? "Instructor" : "Student"}: ${message.content.slice(0, MAX_CONTEXT_MESSAGE_LENGTH)}`)
         .join("\n\n");
       const input = priorContext
         ? `${priorContext}\n\nStudent: ${content}`
