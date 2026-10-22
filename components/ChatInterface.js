@@ -6,6 +6,8 @@ import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 
 const API_URL = (process.env.API_URL || "http://localhost:3003/api").replace(/\/$/, "");
+const MAX_CONTEXT_MESSAGES = 8;
+const MAX_CONTEXT_MESSAGE_LENGTH = 3000;
 const remarkPlugins = [remarkGfm, remarkMath];
 const rehypePlugins = [rehypeKatex];
 
@@ -199,8 +201,8 @@ export default function ChatInterface({ user, isGuest = false, onSignOut, onSign
     try {
       if (isGuest) {
         const priorContext = messages
-          .slice(-16)
-          .map((message) => `${message.role === "assistant" ? "Instructor" : "Student"}: ${message.content.slice(0, 6000)}`)
+          .slice(-MAX_CONTEXT_MESSAGES)
+          .map((message) => `${message.role === "assistant" ? "Instructor" : "Student"}: ${message.content.slice(0, MAX_CONTEXT_MESSAGE_LENGTH)}`)
           .join("\n\n");
         const input = priorContext ? `${priorContext}\n\nStudent: ${question}` : question;
         appendPendingMessages();
